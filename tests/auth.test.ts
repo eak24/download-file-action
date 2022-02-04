@@ -8,3 +8,11 @@ test('Should add token', () => {
     },
   });
 });
+
+test('Should not add token', () => {
+  return download('http://httpbin.org/get', '.', {
+    filename: 'test-result.json',
+    authentication: 'Token',
+    token: '',
+  });
+});

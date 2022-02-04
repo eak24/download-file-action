@@ -91,20 +91,22 @@ const getFilename = (res, data) => {
 module.exports = (uri, output_, opts_) => {
   const output = output_ || process.cwd();
   let authorizationHeader = '';
-  if (opts_.authentication === 'Basic') {
+  if (opts_.authentication === 'Basic' && opts_.username && opts_.password) {
     const buff = Buffer.from(`${opts_.username}:${opts_.password}`);
     authorizationHeader = `Basic ${buff.toString('base64')}`;
-  } else if (opts_.authentication === 'Token') {
+  } else if (opts_.authentication === 'Token' && opts_.token) {
     authorizationHeader = `token ${opts_.token}`;
   }
   const opts = {
     encoding: null,
     rejectUnauthorized: process.env.npm_config_strict_ssl !== 'false',
-    headers: {
-      Authorization: authorizationHeader,
-    },
     ...opts_,
   };
+  if (authorizationHeader) {
+    opts.headers = {
+      Authorization: authorizationHeader,
+    };
+  }
   const stream = got.stream(uri, opts);
 
   const promise = pEvent(stream, 'response').then((res) => {
